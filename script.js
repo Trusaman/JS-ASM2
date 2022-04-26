@@ -20,7 +20,8 @@ function toggleSideBar() {
     sideBar.classList.toggle("active")
 }
 
-const petArr = [];
+let petArr = []
+getFromStorage("pets")
 
 function formData() {
   // Click event when submit
@@ -44,7 +45,7 @@ function formData() {
     renderTableData(petArr);
     clearForm()
   }
-  saveToStorage("pet array", petArr)
+  saveToStorage("pets", petArr.filter(num => num))
 }
 
 function validateData(pet) {
@@ -95,8 +96,7 @@ function renderTableData(arr) {
 		<td><i class="bi bi-${pet.vaccinated ? "check" : "x"}-circle-fill"></i></td>
 		<td><i class="bi bi-${pet.dewormed ? "check" : "x"}-circle-fill"></i></td>
 		<td><i class="bi bi-${pet.sterilized ? "check" : "x"}-circle-fill"></i></td>
-        <td class="bmi">${pet.bmi || "?"}</td>
-		<td>${pet.date.toLocaleDateString("en-GB")}</td>
+		<td>${new Date(pet.date).toLocaleDateString("en-GB")}</td>
 		<td>
             <button type="button" class="btn btn-danger delete-pet" key=${pet.id} onclick="deletePet(this)">Delete</button>
 		</td></tr>`
@@ -124,7 +124,6 @@ function clearForm() {
 // Delete pet
 function deletePet(element) {
     if (!confirm("Are you sure")) return
-    console.log(element.getAttribute("key"))
     for (let i = 0; i < petArr.length; i++) {
         if (!petArr[i]) continue
         if (petArr[i].id == element.getAttribute("key")) {
@@ -133,7 +132,8 @@ function deletePet(element) {
         }
     } 
     renderTableData(petArr)
-    document.getElementById("healthy-btn").textContent = "Show Healthy Pet"   
+    document.getElementById("healthy-btn").textContent = "Show Healthy Pet"  
+    saveToStorage("pets", petArr.filter(num => num))
 }
 
 // Show healthy pet
@@ -150,10 +150,3 @@ function showHealthyPet(element) {
     }    
 }
 
-function saveToStorage(key, val) {
-    localStorage.setItem(key, JSON.stringify(val))
-}
-
-function getFromStorage(key) {
-    return JSON.parse(localStorage.getItem(key))
-}
