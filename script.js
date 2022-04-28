@@ -13,15 +13,18 @@ let sterilizedInput = document.getElementById("input-sterilized");
 let tableBodyEl = document.getElementById("tbody");
 let healthyCheck = true;
 
-let sideBar = document.getElementById("sidebar")
+let sideBar = document.getElementById("sidebar");
 
 // side bar toggle class "active"
 function toggleSideBar() {
-    sideBar.classList.toggle("active")
+  sideBar.classList.toggle("active");
 }
 
-let petArr = []
-getFromStorage("pets")
+let petArr = [];
+getFromStorage("pets");
+
+let breedArr = JSON.parse(localStorage.getItem("breed"));
+// renderBreed(breedArr);
 
 function formData() {
   // Click event when submit
@@ -43,9 +46,12 @@ function formData() {
   if (validateData(data)) {
     petArr.push(data);
     renderTableData(petArr);
-    clearForm()
+    clearForm();
   }
-  saveToStorage("pets", petArr.filter(num => num))
+  saveToStorage(
+    "pets",
+    petArr.filter((num) => num)
+  );
 }
 
 function validateData(pet) {
@@ -98,7 +104,9 @@ function renderTableData(arr) {
 		<td><i class="bi bi-${pet.sterilized ? "check" : "x"}-circle-fill"></i></td>
 		<td>${new Date(pet.date).toLocaleDateString("en-GB")}</td>
 		<td>
-            <button type="button" class="btn btn-danger delete-pet" key=${pet.id} onclick="deletePet(this)">Delete</button>
+            <button type="button" class="btn btn-danger delete-pet" key=${
+              pet.id
+            } onclick="deletePet(this)">Delete</button>
 		</td></tr>`
     )
     .join("");
@@ -123,30 +131,43 @@ function clearForm() {
 
 // Delete pet
 function deletePet(element) {
-    if (!confirm("Are you sure")) return
-    for (let i = 0; i < petArr.length; i++) {
-        if (!petArr[i]) continue
-        if (petArr[i].id == element.getAttribute("key")) {
-            console.log("delete: ", petArr[i]);                
-            delete petArr[i]
-        }
-    } 
-    renderTableData(petArr)
-    document.getElementById("healthy-btn").textContent = "Show Healthy Pet"  
-    saveToStorage("pets", petArr.filter(num => num))
+  if (!confirm("Are you sure")) return;
+  for (let i = 0; i < petArr.length; i++) {
+    if (!petArr[i]) continue;
+    if (petArr[i].id == element.getAttribute("key")) {
+      console.log("delete: ", petArr[i]);
+      delete petArr[i];
+    }
+  }
+  renderTableData(petArr);
+  document.getElementById("healthy-btn").textContent = "Show Healthy Pet";
+  saveToStorage(
+    "pets",
+    petArr.filter((num) => num)
+  );
 }
 
 // Show healthy pet
 function showHealthyPet(element) {
-    if (healthyCheck == true) {
-        healthyCheck = false
-        element.textContent = "Show All Pet";
-        let healthyPets = petArr.filter(pet => (pet.vaccinated && pet.dewormed && pet.sterilized))
-        renderTableData(healthyPets)
-    } else {
-        healthyCheck = true
-        element.textContent = "Show Healthy Pet"
-        renderTableData(petArr)
-    }    
+  if (healthyCheck == true) {
+    healthyCheck = false;
+    element.textContent = "Show All Pet";
+    let healthyPets = petArr.filter(
+      (pet) => pet.vaccinated && pet.dewormed && pet.sterilized
+    );
+    renderTableData(healthyPets);
+  } else {
+    healthyCheck = true;
+    element.textContent = "Show Healthy Pet";
+    renderTableData(petArr);
+  }
 }
 
+function renderBreed() {
+  let breedOptions =
+    `<option>Select Breed</option>` +
+    breedArr.filter(breed => breed.breedType == typeInput.value).map(breed => `<option>${breed.breedData}</option>`).join("");
+  breedInput.innerHTML = breedOptions;
+}
+
+typeInput.addEventListener("change", renderBreed)
